@@ -43,7 +43,30 @@ const resetGame = () => {
 </script>
 
 <template>
-	<div>Henlo!</div>
+	<main class="pt8 text-center">
+		<h1 class="mb-8 text-3xl font-bold uppercase">Tic Tac Toe</h1>
+		<h3 class="text-xl mb-4">Player {{ player.toUpperCase() }}'s turn</h3>
+
+		<div class="flex flex-col items-center mb-8 bg">
+			<div v-for="(row, x) in board" :key="x" class="flex">
+				<div
+					v-for="(cell, y) in row"
+					:key="y"
+					class="flex"
+					@click="makeMove(x, y)"
+					:class="`border border-grey w-24 h-24 hover:bg-gray-600 flex items-center justify-center material-icons-outlined text-4xl cursor-pointer ${
+						cell === 'x' ? 'text-pink-500' : 'text-blue-400'
+					}`"
+				>
+					{{ cell === 'x' ? 'close' : cell === 'o' ? 'circle' : '' }}
+				</div>
+			</div>
+		</div>
+	</main>
 </template>
 
-<style scoped></style>
+<style>
+body {
+	@apply bg-gray-800 text-white;
+}
+</style>
