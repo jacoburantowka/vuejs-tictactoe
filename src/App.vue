@@ -9,18 +9,29 @@ const board = ref([
 ])
 
 const calculateWinner = (board) => {
-	const winningLines = [[0, 1, 2]]
+	const lines = [
+		[0, 1, 2],
+		[3, 4, 5],
+		[6, 7, 8],
+		[0, 3, 6],
+		[1, 4, 7],
+		[2, 5, 8],
+		[0, 4, 8],
+		[2, 4, 6],
+	]
 
-	for (let i = 0; i < winningLines.length; i++) {
-		const [a, b, c] = winningLines[i]
-		if (board[a] && board[a] === board[b] && board === board[c]) {
+	for (let i = 0; i < lines.length; i++) {
+		const [a, b, c] = lines[i]
+
+		if (board[a] && board[a] === board[b] && board[a] === board[c]) {
 			return board[a]
 		}
-		return null
 	}
+
+	return null
 }
 
-const winner = computed(() => calculateWinner(board?.value.flat()))
+const winner = computed(() => calculateWinner(board.value?.flat()))
 
 const makeMove = (x, y) => {
 	if (winner.value) return
@@ -44,23 +55,38 @@ const resetGame = () => {
 
 <template>
 	<main class="pt8 text-center">
-		<h1 class="mb-8 text-3xl font-bold uppercase">Tic Tac Toe</h1>
-		<h3 class="text-xl mb-4">Player {{ player.toUpperCase() }}'s turn</h3>
+		<h1 class="mb-8 text-3xl font-bold">Tic Tac Toe</h1>
+		<h2 class="text-xl mb-4">Player {{ player }}'s turn</h2>
 
 		<div class="flex flex-col items-center mb-8 bg">
 			<div v-for="(row, x) in board" :key="x" class="flex">
-				<div
+				<button
 					v-for="(cell, y) in row"
 					:key="y"
-					class="flex"
 					@click="makeMove(x, y)"
-					:class="`border border-grey w-24 h-24 hover:bg-gray-600 flex items-center justify-center material-icons-outlined text-4xl cursor-pointer ${
+					:class="`border border-gray-400 w-24 h-24 flex items-center justify-center material-icons-outlined text-4xl ${
 						cell === 'x' ? 'text-pink-500' : 'text-blue-400'
+					} ${
+						winner
+							? 'bg-gray-900 focus:outline-none hover:border-gray-400'
+							: 'hover:bg-gray-600 cursor-pointer'
 					}`"
+					:disabled="winner"
 				>
 					{{ cell === 'x' ? 'close' : cell === 'o' ? 'circle' : '' }}
-				</div>
+				</button>
 			</div>
+		</div>
+		<div class="text-center">
+			<h2 v-if="winner" class="text-6xl font-bold mb-8">
+				Player '{{ winner }}' wins!
+			</h2>
+			<button
+				@click="resetGame"
+				class="px-4 py-2 bg-pink-500 rounded uppercase font-bold hover:bg-pink-600 duration-300"
+			>
+				Reset
+			</button>
 		</div>
 	</main>
 </template>
