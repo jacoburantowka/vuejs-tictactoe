@@ -33,6 +33,68 @@ const calculateWinner = (board) => {
 
 const winner = computed(() => calculateWinner(board.value?.flat()))
 
+const playMove = () => {
+	let bestScore = -Infinity
+
+	for (let i = 0; i < 3; i++) {
+		for (let j = 0; j < 3; j++) {
+			if (!board.value[i][j]) {
+				console.warn(board.value[i][j])
+				board.value[i][j] = 'o'
+				let score = minimax(board, 0, false)
+				board.value[i][j] = ''
+				if (score > bestScore) {
+					bestScore = score
+					console.warn(`best move is ${i} and ${j}`)
+				}
+			}
+		}
+	}
+}
+
+const scores = {
+	x: 10,
+	o: -10,
+	tie: 0,
+}
+
+const minimax = (board, depth, isMax) => {
+	let result = calculateWinner(board)
+	if (result !== null) {
+		return scores[result]
+	}
+
+	if (isMax) {
+		let bestScore = -Infinity
+		for (let i = 0; i < 3; i++) {
+			for (let j = 0; j < 3; j++) {
+				if (!board.value[i][j]) {
+					board.value[i][j] = 'o'
+					let score = minimax(board, depth + 1, false)
+					board.value[i][j] = ''
+					bestScore = Math.max(bestScore, score)
+				}
+			}
+		}
+		console.log(bestScore)
+		return bestScore
+	} else {
+		let bestScore = Infinity
+		for (let i = 0; i < 3; i++) {
+			for (let j = 0; j < 3; j++) {
+				if (!board.value[i][j]) {
+					board.value[i][j] = 'o'
+					let score = minimax(board, depth + 1, true)
+					board.value[i][j] = ''
+					bestScore = Math.min(bestScore, score)
+				}
+			}
+		}
+		console.log(bestScore)
+		return bestScore
+	}
+}
+
 const makeMove = (x, y) => {
 	if (winner.value) return
 
@@ -41,6 +103,8 @@ const makeMove = (x, y) => {
 	board.value[x][y] = player.value
 
 	player.value = player.value === 'x' ? 'o' : 'x'
+
+	console.log(playMove())
 }
 
 const resetGame = () => {
@@ -56,7 +120,7 @@ const resetGame = () => {
 <template>
 	<main class="pt8 text-center">
 		<h1 class="mb-8 text-3xl font-bold">Tic Tac Toe</h1>
-		<h2 class="text-xl mb-4">Player {{ player }}'s turn</h2>
+		<h2 v-if="!winner" class="text-xl mb-4">Player {{ player }}'s turn</h2>
 
 		<div class="flex flex-col items-center mb-8 bg">
 			<div v-for="(row, x) in board" :key="x" class="flex">
@@ -79,7 +143,7 @@ const resetGame = () => {
 		</div>
 		<div class="text-center">
 			<h2 v-if="winner" class="text-6xl font-bold mb-8">
-				Player '{{ winner }}' wins!
+				Player {{ winner.toUpperCase() }} wins!
 			</h2>
 			<button
 				@click="resetGame"
